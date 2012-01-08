@@ -2,7 +2,8 @@ if (!String.prototype.format) {
     String.prototype.format = function() {
         var formatted = this;
         for(arg in arguments) {
-            formatted = formatted.replace("{" + arg + "}", arguments[arg]);
+            var r = new RegExp("\\{" + arg + "\\}", "g");
+            formatted = formatted.replace(r, arguments[arg]);
         }
         return formatted;
     };
@@ -19,7 +20,7 @@ if (!String.prototype.format) {
 
     MESSAGE_FORMAT = "<a href='https://www.github.com/{0}/{1}/commit/{2}'>{3}</a>",
 
-    HEADING_FORMAT = "Latest commits for <a href='https://www.github.com/{0}/{1}'>{2}</a> repository.",
+    HEADING_FORMAT = "Latest commits for <a href='https://www.github.com/{0}/{1}'>{1}</a> repository.",
 
     getCommitMessage = function(commit) {
         var message = commit.message;
@@ -47,7 +48,7 @@ if (!String.prototype.format) {
         heading.className = "jscommits-heading";
         element.className += " jscommits-panel";
         
-        heading.innerHTML = HEADING_FORMAT.format(user, repo, repo);
+        heading.innerHTML = HEADING_FORMAT.format(user, repo);
 
         element.appendChild(heading);
         element.appendChild(commits);
