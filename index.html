@@ -1,0 +1,20 @@
+<html>
+    <head>
+        <link href="jscommits.css" rel="stylesheet" type="text/css" />
+        <script src="github.js"></script>
+        <script src="jscommits.js"></script>
+        <style>
+            #uedit-commits {
+                margin: 20px auto;
+            }
+
+        </style>
+    </head>
+    <body>
+        <div id="uedit-commits">
+        </div>
+        <script type="text/javascript">
+            jscommits.showCommits("torvalds", "linux", document.getElementById("uedit-commits"));
+        </script>
+    </body>
+</html>
