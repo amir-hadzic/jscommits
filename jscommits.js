@@ -36,8 +36,10 @@ if (!String.prototype.format) {
         return message;
     },
     
-    getAuthorShort = function(author) {
-        return author.substr(0, Math.min(AUTHOR_LENGTH, author.length));
+    getAuthor = function(commit) {
+        var username = commit.author.login;
+        
+        return username.substr(0, Math.min(AUTHOR_LENGTH, username.length));
     };
 
     jscommits.showCommits = function(user, repo, element) {
@@ -65,10 +67,10 @@ if (!String.prototype.format) {
                 commitMessage.className = "jscommits-message";
                 commitAuthor.className = "jscommits-author";
                 
-                commitMessage.innerHTML = MESSAGE_FORMAT.format(user, repo, 
-                    commit.id, getCommitMessage(commit));
+                commitMessage.innerHTML = MESSAGE_FORMAT.format(commit.author.login,
+                    repo, commit.id, getCommitMessage(commit));
 
-                commitAuthor.innerHTML = AUTHOR_FORMAT.format(user, getAuthorShort(user)); 
+                commitAuthor.innerHTML = AUTHOR_FORMAT.format(commit.author.login, getAuthor(commit)); 
 
                 commitPanel.appendChild(commitAuthor);
                 commitPanel.appendChild(commitMessage);
