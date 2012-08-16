@@ -1,0 +1,3 @@
+[submodule "gh3"]
+	path = gh3
+	url = https://github.com/k33g/gh3.git
