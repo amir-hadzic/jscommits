@@ -12,8 +12,6 @@ if (!String.prototype.format) {
 (function (globals) {    
     var jscommits = globals.jscommits = {},
 
-    MESSAGE_LENGTH = 80,
-    AUTHOR_LENGTH = 20,
     GITHUB = "https://www.github.com",
     HEADING_FORMAT = "Latest commits for <a href='https://www.github.com/{0}/{1}'>{1}</a> repository.",
 
@@ -32,10 +30,10 @@ if (!String.prototype.format) {
         var firstSentencePos = message.indexOf("\n");
         
         if (firstSentencePos <  0 || firstSentencePos === 0) {
-            firstSentencePos = MESSAGE_LENGTH;
+            firstSentencePos = message.length; 
         }
 
-        message = message.substr(0, Math.min(MESSAGE_LENGTH, message.length, firstSentencePos));
+        message = message.substr(0, firstSentencePos);
         return message;
     },
     
@@ -62,7 +60,7 @@ if (!String.prototype.format) {
             }
         }
 
-        return username.substr(0, Math.min(AUTHOR_LENGTH, username.length));
+        return username;
     },
     
     getMessageElem = function(user, repo, commit) {
