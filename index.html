@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <meta charset='utf-8' />
+    <meta http-equiv="X-UA-Compatible" content="chrome=1" />
+    <meta name="description" content="jscommits : Javascript widget for showing latest github commits" />
+
+    <link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
+    <link rel="stylesheet" type="text/css" media="screen" href="stylesheets/jscommits-min.css">
+
+    <title>jscommits</title>
+  </head>
+
+  <body>
+
+    <!-- HEADER -->
+    <div id="header_wrap" class="outer">
+        <header class="inner">
+          <a id="forkme_banner" href="https://github.com/amir-hadzic/jscommits">View on GitHub</a>
+
+          <h1 id="project_title">jscommits</h1>
+          <h2 id="project_tagline">Javascript widget for showing latest github commits</h2>
+
+            <section id="downloads">
+              <a class="zip_download_link" href="https://github.com/amir-hadzic/jscommits/zipball/master">Download this project as a .zip file</a>
+              <a class="tar_download_link" href="https://github.com/amir-hadzic/jscommits/tarball/master">Download this project as a tar.gz file</a>
+            </section>
+        </header>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div id="main_content_wrap" class="outer">
+      <section id="main_content" class="inner">
+      <h2>Widget demo</h2>
+      <p>Here's a demo of how the widget works for two different projects.</p>
+      <h3>jscommits repository</h3>
+      <div id="commits-demo-jscommits" class="commits"></div>
+      <h3>linux repository</h3>
+      <div id="commits-demo-linux" class="commits"></div>
+      </section>
+    </div>
+
+    <!-- FOOTER  -->
+    <div id="footer_wrap" class="outer">
+      <footer class="inner">
+        <p class="copyright">jscommits maintained by <a href="https://github.com/amir-hadzic">amir-hadzic</a></p>
+        <p>Published with <a href="http://pages.github.com">GitHub Pages</a></p>
+      </footer>
+    </div>
+
+
+    <script type="text/javascript" src="jquery-1.8.0.min.js"></script>
+    <script type="text/javascript" src="underscore-min.js"></script>
+    <script type="text/javascript" src="gh3/gh3.js"></script>
+    <script type="text/javascript" src="jscommits.js"></script>
+    <script type="text/javascript">
+        var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+        document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+        
+        try {
+            var pageTracker = _gat._getTracker("UA-34180728-1");
+            pageTracker._trackPageview();
+        } catch(err) {}
+
+        jscommits.showCommits("amir-hadzic", "jscommits", document.getElementById("commits-demo-jscommits"));
+        jscommits.showCommits("torvalds", "linux", document.getElementById("commits-demo-linux"));
+    </script>
+  </body>
+</html>
