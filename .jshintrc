@@ -1,0 +1,22 @@
+{
+  "camelcase": true,
+  "curly": true,
+  "forin": true,
+  "freeze": true,
+  "immed": true,
+  "indent": 2,
+  "noarg": true,
+  "noempty": true,
+  "nomen": true,
+  "eqeqeq": true,
+  "onevar": true,
+  "strict": true,
+  "undef": true,
+  "unused": true,
+  "trailing": true,
+  "white": true,
+  "predef": [
+    "confirm",
+    "window"
+  ]
+}

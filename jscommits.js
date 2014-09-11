@@ -1,126 +1,136 @@
-if (!String.prototype.format) {
-    String.prototype.format = function() {
-        var formatted = this;
-        for(arg in arguments) {
-            var r = new RegExp("\\{" + arg + "\\}", "g");
-            formatted = formatted.replace(r, arguments[arg]);
-        }
-        return formatted;
-    };
-}
+/* globals document, Gh3 */
 
-(function (globals) {    
-    var jscommits = globals.jscommits = {},
+(function () {
+  "use strict";
+  if (!String.prototype.format) {
+    String.prototype.format = function () {
+      var arg, regex, formatted = this;
+      for (arg in arguments) {
+        if (arguments.hasOwnProperty(arg)) {
+          regex = new RegExp("\\{" + arg + "\\}", "g");
+          formatted = formatted.replace(regex, arguments[arg]);
+        }
+      }
+      return formatted;
+    };
+  }
+})();
+
+(function (globals) {
+  "use strict";
+  var jscommits = globals.jscommits = {},
 
     GITHUB = "https://www.github.com",
     HEADING_FORMAT = "Latest commits for <a href='https://www.github.com/{0}/{1}'>{1}</a> repository.",
 
-    getUrl = function(parts) {
-        var url = GITHUB;
+    getUrl = function () {
+      var i, url = GITHUB;
 
-        for (var i = 0; i < arguments.length; i++) {
-            url += "/" + arguments[i];
-        }
+      for (i = 0; i < arguments.length; i++) {
+        url += "/" + arguments[i];
+      }
 
-        return url;
+      return url;
     },
 
-    getCommitMessage = function(commit) {
-        var message = commit.commit.message;
-        var firstSentencePos = message.indexOf("\n");
-        
-        if (firstSentencePos <  0 || firstSentencePos === 0) {
-            firstSentencePos = message.length; 
-        }
+    getCommitMessage = function (commit) {
+      var message = commit.commit.message,
+        firstSentencePos = message.indexOf("\n");
 
-        message = message.substr(0, firstSentencePos);
-        return message;
+      if (firstSentencePos <  0 || firstSentencePos === 0) {
+        firstSentencePos = message.length;
+      }
+
+      message = message.substr(0, firstSentencePos);
+      return message;
+    },
+      
+    getAuthorLogin = function (commit) {
+      if (commit.committer && commit.committer.login) {
+        return commit.committer.login;
+      } else if (commit.author && commit.author.login) {
+        return commit.author.login;
+      }
+
+      return null;
+    },
+
+    getAuthorShortName = function (commit) {
+      var username = getAuthorLogin(commit);
+
+      if (!username) {
+        commit = commit.commit;
+
+        if (commit.author && commit.author.email) {
+          username = commit.author.email;
+        } else if (commit.committer && commit.committer.email) {
+          username = commit.committer.email;
+        }
+      }
+
+      return username;
     },
     
-    getAuthorLogin = function(commit) {
-        if (commit.committer && commit.committer.login) {
-            return commit.committer.login;
-        } else if (commit.author && commit.author.login) {
-            return commit.author.login;
-        }
+    getMessageElem = function (user, repo, commit) {
+      var el, a = document.createElement("a");
+      a.innerHTML = getCommitMessage(commit);
+      a.href = getUrl(user, repo, "commit", commit.sha);
 
-        return null;
+      el = document.createElement("span");
+      el.className = "jscommits-message";
+      el.appendChild(a);
+
+      return el;
     },
 
-    getAuthorShortName = function(commit) {
-        var username = getAuthorLogin(commit);
+    getAuthorElem = function (commit) {
+      var el = document.createElement("span"),
+        a = document.createElement("a"),
+        login = getAuthorLogin(commit);
 
-        if (!username) {
-            var commit = commit.commit;
+      if (login) {
+        a.href = getUrl(login);
+      } else {
+        a.href = "#";
+      }
 
-            if (commit.author && commit.author.email) {
-                username = commit.author.email;
-            } else if (commit.committer && commit.committer.email) {
-                username = commit.committer.email;
-            }
-        }
-
-        return username;
-    },
-    
-    getMessageElem = function(user, repo, commit) {
-        var a = document.createElement("a");
-        a.innerHTML = getCommitMessage(commit); 
-        a.href = getUrl(user, repo, "commit", commit.sha);
-        
-        var el = document.createElement("span");
-        el.className = "jscommits-message";
-        el.appendChild(a);
-
-        return el;
-    },
-
-    getAuthorElem = function(commit) {
-        var login = getAuthorLogin(commit); 
-        var a = document.createElement("a");
-        a.innerHTML = getAuthorShortName(commit); 
-        
-        if (login) {
-            a.href = getUrl(login); 
-        } else {
-            a.href = "#";
-        }
-        
-        var el = document.createElement("span");
-        el.className = "jscommits-author";
-        el.appendChild(a);
-        return el;
+      a.innerHTML = getAuthorShortName(commit);
+      el.className = "jscommits-author";
+      el.appendChild(a);
+      return el;
     };
 
-    jscommits.showCommits = function(user, repo, element) {
-        var heading = document.createElement("div");
-        heading.innerHTML = HEADING_FORMAT.format(user, repo);
-        heading.className = "jscommits-heading";
-        
-        var commits = document.createElement("div");
-        Gh3.Helper.callHttpApi({
-            service : "repos/" + user + "/" + repo + "/commits",
-            success : function(res) {
-                var length = res.data.length > 15 ? 15 : res.data.length;
-                var flip = false;
+  jscommits.showCommits = function (user, repo, element) {
+    var commits = document.createElement("div"),
+      heading = document.createElement("div");
 
-                for (var i = 0; i < length; i++) {
-                    var commit = res.data[i];
-                    var commitPanel = document.createElement("div");
-                    var commitMessage = getMessageElem(user, repo, commit); 
-                    var commitAuthor = getAuthorElem(commit); 
+    Gh3.Helper.callHttpApi({
+      service : "repos/" + user + "/" + repo + "/commits",
+      success : function (res) {
+        var i, flip = false, length = res.data.length > 15 ? 15 : res.data.length,
+          commit, commitPanel, commitMessage, commitAuthor;
 
-                    commitPanel.className = flip ? "jscommits-commit flip-color" : "jscommits-commit";
-                    commitPanel.appendChild(commitAuthor);
-                    commitPanel.appendChild(commitMessage);
-                    commits.appendChild(commitPanel);
-                    flip = !flip;
-                }
-            }
-        });
-    
-        element.className += " jscommits-panel";
-        element.appendChild(heading);
-        element.appendChild(commits);
-    };   
+        for (i = 0; i < length; i++) {
+          commit = res.data[i];
+          commitMessage = getMessageElem(user, repo, commit);
+          commitAuthor = getAuthorElem(commit);
+
+          commitPanel = document.createElement("div");
+          commitPanel.className = flip ? "jscommits-commit flip-color" : "jscommits-commit";
+          commitPanel.appendChild(commitAuthor);
+          commitPanel.appendChild(commitMessage);
+
+          commits.appendChild(commitPanel);
+          flip = !flip;
+        }
+      }
+    });
+
+    heading.innerHTML = HEADING_FORMAT.format(user, repo);
+    heading.className = "jscommits-heading";
+
+    element.className += " jscommits-panel";
+    element.appendChild(heading);
+    element.appendChild(commits);
+  };
 }(window));
